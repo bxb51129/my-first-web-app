@@ -38,23 +38,18 @@ connectDB().then(async () => {
 
 const app = express();
 
-// CORS 配置
-app.use(cors({
-  origin: true, // 允许所有来源
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
-}));
-
-// 添加一个预检请求的处理
-app.options('*', cors());
-
-// 添加一个中间件来设置额外的 CORS 头
+// 添加新的 CORS 配置
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Origin', 'https://my-first-web-app-sigma.vercel.app');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  
+  // 处理 OPTIONS 请求
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  
   next();
 });
 
@@ -121,28 +116,18 @@ app.use((req, res) => {
   });
 });
 
-// 全局错误处理
+// 在文件开头添加 unhandledRejection 处理
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+// 修改错误处理中间件
 app.use((err, req, res, next) => {
-  console.error('Error details:', {
-    message: err.message,
-    stack: err.stack,
-    path: req.path,
-    method: req.method,
-    body: req.body
+  console.error('Error occurred:', err);
+  res.status(500).json({ 
+    error: 'Internal server error',
+    message: process.env.NODE_ENV === 'development' ? err.message : undefined
   });
-  
-  const error = {
-    status: err.status || 500,
-    message: process.env.NODE_ENV === 'production' 
-      ? '服务器错误' 
-      : err.message || '服务器错误',
-  };
-  
-  if (process.env.NODE_ENV === 'development') {
-    error.stack = err.stack;
-  }
-  
-  res.status(error.status).json({ error });
 });
 
 // 修改服务器启动部分，添加更多错误处理
