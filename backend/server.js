@@ -40,10 +40,12 @@ const app = express();
 
 // CORS 配置
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  origin: ['https://my-first-web-app-git-main-byw1123s-projects.vercel.app', 'http://localhost:3000'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
+  maxAge: 86400 // 预检请求的有效期，单位为秒
 }));
 
 // 开发环境日志
