@@ -40,13 +40,23 @@ const app = express();
 
 // CORS 配置
 app.use(cors({
-  origin: ['https://my-first-web-app-git-main-byw1123s-projects.vercel.app', 'http://localhost:3000'],
+  origin: true, // 允许所有来源
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar'],
-  maxAge: 86400 // 预检请求的有效期，单位为秒
 }));
+
+// 添加一个预检请求的处理
+app.options('*', cors());
+
+// 添加一个中间件来设置额外的 CORS 头
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  next();
+});
 
 // 开发环境日志
 if (process.env.NODE_ENV === 'development') {
@@ -57,16 +67,6 @@ if (process.env.NODE_ENV === 'development') {
 app.use(helmet());
 app.use(compression());  // 启用压缩
 app.use(mongoSanitize());  // 防止 MongoDB 注入
-
-// 添加更多安全headers
-app.use(helmet.contentSecurityPolicy({
-  directives: {
-    defaultSrc: ["'self'"],
-    scriptSrc: ["'self'", "'unsafe-inline'"],
-    styleSrc: ["'self'", "'unsafe-inline'"],
-    imgSrc: ["'self'", "data:", "https:"],
-  },
-}));
 
 // 速率限制
 const limiter = rateLimit({
