@@ -17,6 +17,7 @@ function RegisterPage() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({ email, password })
       });
 
@@ -28,7 +29,6 @@ function RegisterPage() {
 
       setMessage('Registration successful!');
       
-      // 延迟一下再跳转，让用户看到成功消息
       setTimeout(() => {
         navigate('/login');
       }, 1500);

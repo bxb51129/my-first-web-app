@@ -20,32 +20,32 @@ console.log('Environment variables loaded:', {
   PORT: process.env.PORT
 });
 
-// 取消注释数据库连接部分
-connectDB().then(async () => {
+// 修改数据库连接部分
+connectDB().then(() => {
     console.log('MongoDB connected successfully');
-    
-    // 测试数据库连接
-    try {
-        const testUser = await User.findOne({});
-        console.log('Database test - Found user:', testUser ? 'Yes' : 'No');
-    } catch (error) {
-        console.error('Database test failed:', error);
-    }
 }).catch(err => {
     console.error('MongoDB connection error:', err);
-    process.exit(1);
 });
 
 const app = express();
 
-// 添加新的 CORS 配置
+// 修改 CORS 配置
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'https://my-first-web-app-sigma.vercel.app');
+  // 允许多个域名
+  const allowedOrigins = [
+    'https://my-first-web-app-sigma.vercel.app',
+    'http://localhost:3000'
+  ];
+  const origin = req.headers.origin;
+  
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   
-  // 处理 OPTIONS 请求
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
