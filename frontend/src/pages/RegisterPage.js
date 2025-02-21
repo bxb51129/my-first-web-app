@@ -15,25 +15,24 @@ function RegisterPage() {
       const response = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Content-Type': 'application/json'
         },
+        mode: 'cors',
         credentials: 'include',
         body: JSON.stringify({ email, password })
       });
 
-      const data = await response.json();
-      
       if (!response.ok) {
+        const data = await response.json();
         throw new Error(data.error || 'Registration failed');
       }
 
       setMessage('Registration successful!');
-      
       setTimeout(() => {
         navigate('/login');
       }, 1500);
     } catch (error) {
+      console.error('Registration error:', error);
       setMessage(error.message || 'Registration failed');
     }
   };
