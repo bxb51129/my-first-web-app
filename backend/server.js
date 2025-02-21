@@ -11,10 +11,20 @@ const app = express();
 
 // 基本中间件
 app.use(express.json());
-app.use(cors({
-  origin: 'https://my-first-web-app-sigma.vercel.app',
-  credentials: true
-}));
+
+// CORS 配置
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'https://my-first-web-app-sigma.vercel.app');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+
+  // 处理 OPTIONS 请求
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  next();
+});
 
 // 数据库连接
 connectDB().then(() => {
