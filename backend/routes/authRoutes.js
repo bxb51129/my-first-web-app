@@ -1,5 +1,5 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 //const sendEmail = require('../utils/sendEmail'); // 自定义的邮件发送工具
@@ -45,20 +45,11 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'User already exists' });
     }
 
-    // 加密密码
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
     // 创建新用户
-    const user = new User({
-      email,
-      password: hashedPassword
-    });
-
+    const user = new User({ email, password });
     await user.save();
-    console.log('User registered successfully:', email);
 
-    res.status(201).json({ message: 'Registration successful' });
+    res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
     console.error('Registration error:', error);
     res.status(500).json({ error: 'Registration failed' });
