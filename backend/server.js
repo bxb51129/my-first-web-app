@@ -1,10 +1,5 @@
 const express = require('express');
-const dotenv = require('dotenv');
 const cors = require('cors');
-const connectDB = require('./config/db');
-
-// 加载环境变量
-dotenv.config();
 
 const app = express();
 
@@ -12,38 +7,46 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// 测试路由
-app.get('/test', (req, res) => {
-  res.json({ message: 'Server is working' });
+// 请求日志
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path}`);
+  next();
 });
 
-// 数据库连接
-let isConnected = false;
-
-const startServer = async () => {
+// 根路由
+app.get('/', async (req, res) => {
   try {
-    // 连接数据库
-    await connectDB();
-    console.log('MongoDB connected');
-    isConnected = true;
-
-    // API 路由
-    if (isConnected) {
-      app.use('/api/auth', require('./routes/authRoutes'));
-      app.use('/api/items', require('./routes/itemRoutes'));
-    }
-
+    res.status(200).json({ message: 'Hello from the API!' });
   } catch (error) {
-    console.error('Failed to connect to MongoDB:', error);
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
   }
-};
+});
 
-startServer();
+// 测试路由
+app.get('/hello', async (req, res) => {
+  try {
+    res.status(200).json({ message: 'Hello World!' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// 404 处理
+app.use((req, res) => {
+  res.status(404).json({ 
+    error: 'Not Found',
+    path: req.path,
+    method: req.method
+  });
+});
 
 // 错误处理
 app.use((err, req, res, next) => {
-  console.error('Server error:', err);
+  console.error(err);
   res.status(500).json({ error: 'Server error' });
 });
 
+// 导出 app
 module.exports = app;
