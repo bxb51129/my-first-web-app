@@ -39,6 +39,7 @@ app.get('/test', (req, res) => {
 
 // API 路由
 app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/items', require('./routes/itemRoutes'));
 
 // 404 处理
 app.use((req, res) => {

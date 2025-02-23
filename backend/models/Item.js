@@ -3,12 +3,15 @@ const mongoose = require('mongoose');
 const itemSchema = new mongoose.Schema({
   title: {
     type: String,
-    required: true,
-    trim: true
+    required: true
   },
   description: {
     type: String,
-    trim: true
+    required: true
+  },
+  completed: {
+    type: Boolean,
+    default: false
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
