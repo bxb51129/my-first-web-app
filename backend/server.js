@@ -14,25 +14,53 @@ app.use((req, res, next) => {
   next();
 });
 
+// 连接数据库
+const connectDB = async () => {
+  try {
+    if (!process.env.MONGODB_URI) {
+      throw new Error('MONGODB_URI is not defined');
+    }
+
+    await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+
+    console.log('MongoDB connected');
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
+    throw error;
+  }
+};
+
 // 根路由
 app.get('/', (req, res) => {
   res.json({ message: 'API is working' });
 });
 
-// 数据库连接测试
+// 数据库状态
 app.get('/db-status', async (req, res) => {
   try {
     if (!process.env.MONGODB_URI) {
       throw new Error('MONGODB_URI is not defined');
     }
     
-    const status = mongoose.connection.readyState;
+    // 如果未连接，尝试连接
+    if (mongoose.connection.readyState !== 1) {
+      await connectDB();
+    }
+    
     res.json({
-      status: status === 1 ? 'connected' : 'disconnected',
-      uri_exists: !!process.env.MONGODB_URI
+      status: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+      uri_exists: true,
+      uri_value: process.env.MONGODB_URI.substring(0, 20) + '...'
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Database error:', error);
+    res.status(500).json({ 
+      error: error.message,
+      uri_exists: !!process.env.MONGODB_URI
+    });
   }
 });
 
@@ -41,5 +69,8 @@ app.use((err, req, res, next) => {
   console.error('Error:', err);
   res.status(500).json({ error: err.message });
 });
+
+// 初始化连接
+connectDB().catch(console.error);
 
 module.exports = app;
