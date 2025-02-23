@@ -12,16 +12,19 @@ function RegisterPage() {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
+      console.log('Attempting registration...');
       const response = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
-        mode: 'cors',
-        credentials: 'include',
+        credentials: 'same-origin',
         body: JSON.stringify({ email, password })
       });
 
+      console.log('Response received:', response);
+      
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.error || 'Registration failed');
