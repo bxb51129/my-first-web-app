@@ -23,6 +23,9 @@ app.get('/', async (req, res) => {
   }
 });
 
+// API 路由
+app.use('/api/auth', require('./routes/authRoutes'));
+
 // 测试路由
 app.get('/hello', async (req, res) => {
   try {
