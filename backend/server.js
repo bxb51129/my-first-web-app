@@ -14,15 +14,32 @@ const app = express();
 app.use(express.json());
 
 // CORS 配置
-app.use(cors({
-  origin: true,  // 允许所有来源
-  credentials: false  // 禁用 credentials
-}));
+app.use((req, res, next) => {
+  // 允许特定域名
+  const allowedOrigins = ['https://my-first-web-app-sigma.vercel.app'];
+  const origin = req.headers.origin;
+  
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
 
-// 在路由之前添加请求日志
+  // 其他必要的 CORS 头
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Max-Age', '86400'); // 24 hours
+  
+  // 处理预检请求
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  
+  next();
+});
+
+// 请求日志
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`, {
-    body: req.body,
+    origin: req.headers.origin,
     headers: req.headers
   });
   next();
