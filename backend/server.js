@@ -4,19 +4,30 @@ const mongoose = require('mongoose');
 
 const app = express();
 
+// CORS 配置
+const corsOptions = {
+  origin: 'https://my-first-web-app-sigma.vercel.app',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  preflightContinue: false,
+  optionsSuccessStatus: 204
+};
+
 // 基本中间件
 app.use(express.json());
-app.use(cors({
-  origin: 'https://my-first-web-app-sigma.vercel.app',
-  credentials: true
-}));
+app.use(cors(corsOptions));
+
+// 预检请求处理
+app.options('*', cors(corsOptions));
 
 // 请求日志
 app.use((req, res, next) => {
   console.log('Request:', {
     method: req.method,
     path: req.path,
-    body: req.body
+    body: req.body,
+    headers: req.headers
   });
   next();
 });

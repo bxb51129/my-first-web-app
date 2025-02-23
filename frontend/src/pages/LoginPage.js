@@ -11,43 +11,37 @@ function LoginPage() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    console.log('Attempting login with:', { email });
-
     try {
+      console.log('Attempting login...');
       const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         credentials: 'include',
         body: JSON.stringify({ email, password })
       });
 
+      console.log('Login response:', response);
+
       if (!response.ok) {
-        const errorData = await response.json();
-        setMessage(errorData.error || 'Login failed');
-        throw new Error(errorData.error || 'Login failed');
+        const data = await response.json();
+        throw new Error(data.error || 'Login failed');
       }
 
       const data = await response.json();
       console.log('Login successful:', data);
-      
-      // 保存完整的 token，包括 Bearer 前缀
-      if (data.token) {
-        localStorage.setItem('token', `Bearer ${data.token}`);
-        localStorage.setItem('user', JSON.stringify(data.user));
-      }
+
+      // 保存 token
+      localStorage.setItem('token', data.token);
       
       setMessage('Login successful!');
-      
-      // 延迟一下再跳转，让用户看到成功消息
       setTimeout(() => {
-        navigate('/dashboard');  // 跳转到仪表板页面
+        navigate('/dashboard');
       }, 1500);
-
     } catch (error) {
       console.error('Login error:', error);
-      setMessage(error.message || 'Network error. Please try again later.');
+      setMessage(error.message || 'Login failed');
     }
   };
 
