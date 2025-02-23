@@ -10,22 +10,14 @@ dotenv.config({ path: path.join(__dirname, '.env') });
 // 创建 Express 应用
 const app = express();
 
-// 在所有路由之前添加 CORS 中间件
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://my-first-web-app-sigma.vercel.app');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
-
-  // 处理 OPTIONS 请求
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
-  next();
-});
-
 // 基本中间件
 app.use(express.json());
+
+// CORS 配置
+app.use(cors({
+  origin: true,  // 允许所有来源
+  credentials: false  // 禁用 credentials
+}));
 
 // 测试路由
 app.get('/api/test', (req, res) => {
