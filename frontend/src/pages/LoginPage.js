@@ -32,8 +32,8 @@ function LoginPage() {
       const data = await response.json();
       console.log('Login successful:', data);
 
-      // 保存 token
-      localStorage.setItem('token', data.token);
+      // 保存 token，确保添加 Bearer 前缀
+      localStorage.setItem('token', `Bearer ${data.token}`);
       
       setMessage('Login successful!');
       setTimeout(() => {
