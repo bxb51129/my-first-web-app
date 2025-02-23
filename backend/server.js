@@ -6,51 +6,47 @@ const app = express();
 
 // 基本中间件
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: 'https://my-first-web-app-sigma.vercel.app',
+  credentials: true
+}));
 
 // 请求日志
 app.use((req, res, next) => {
-  console.log(`${req.method} ${req.path}`);
+  console.log('Request:', {
+    method: req.method,
+    path: req.path,
+    body: req.body
+  });
   next();
 });
 
-// API 路由前缀
-app.use('/api', (req, res, next) => {
-  console.log('API request:', req.method, req.path);
-  next();
+// 测试路由
+app.get('/test', (req, res) => {
+  res.json({ message: 'Backend is working' });
 });
 
 // API 路由
 app.use('/api/auth', require('./routes/authRoutes'));
 
-// 根路由
-app.get('/', (req, res) => {
-  res.json({ message: 'API is working' });
-});
-
 // 404 处理
 app.use((req, res) => {
-  console.log('404 Not Found:', req.method, req.path);
-  res.status(404).json({ 
+  console.log('404:', req.method, req.path);
+  res.status(404).json({
     error: 'Not Found',
-    path: req.path 
+    path: req.path
   });
 });
 
 // 错误处理
 app.use((err, req, res, next) => {
-  console.error('Server error:', err);
+  console.error('Error:', err);
   res.status(500).json({ error: err.message });
 });
 
-// 数据库连接
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-}).then(() => {
-  console.log('MongoDB connected');
-}).catch(err => {
-  console.error('MongoDB connection error:', err);
-});
+// 连接数据库
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.error('MongoDB error:', err));
 
 module.exports = app;
