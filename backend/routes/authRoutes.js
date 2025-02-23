@@ -14,13 +14,13 @@ const hashPassword = async (password) => {
 // 用户注册
 router.post('/register', async (req, res) => {
   try {
+    console.log('Registration request received:', req.body);
+    
     const { email, password } = req.body;
-    console.log('Registration attempt:', { email });
     
     if (!email || !password) {
-      return res.status(400).json({ 
-        error: 'Please provide both email and password' 
-      });
+      console.log('Missing email or password');
+      return res.status(400).json({ error: 'Email and password are required' });
     }
 
     // 检查邮箱格式
@@ -41,15 +41,15 @@ router.post('/register', async (req, res) => {
     // 检查用户是否已存在
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ 
-        error: 'User with this email already exists' 
-      });
+      console.log('User already exists:', email);
+      return res.status(400).json({ error: 'User already exists' });
     }
 
-    // 创建新用户
+    // 加密密码
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    
+
+    // 创建新用户
     const user = new User({
       email,
       password: hashedPassword
@@ -57,16 +57,11 @@ router.post('/register', async (req, res) => {
 
     await user.save();
     console.log('User registered successfully:', email);
-    
-    res.status(201).json({
-      message: 'Registration successful',
-      user: { email: user.email }
-    });
+
+    res.status(201).json({ message: 'Registration successful' });
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ 
-      error: 'An error occurred during registration' 
-    });
+    res.status(500).json({ error: 'Registration failed' });
   }
 });
 

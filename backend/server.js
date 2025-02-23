@@ -19,6 +19,15 @@ app.use(cors({
   credentials: false  // 禁用 credentials
 }));
 
+// 在路由之前添加请求日志
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`, {
+    body: req.body,
+    headers: req.headers
+  });
+  next();
+});
+
 // 测试路由
 app.get('/api/test', (req, res) => {
   res.json({ message: 'API is working' });
@@ -29,18 +38,30 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
-// 数据库连接
-connectDB()
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+// 初始化数据库
+const initDB = async () => {
+  const isConnected = await connectDB();
+  if (!isConnected) {
+    console.log('Warning: Server starting without database connection');
+  }
+};
+
+// 启动数据库连接但不等待
+initDB();
 
 // API 路由
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/items', require('./routes/itemRoutes'));
 
+// 404 处理
+app.use((req, res) => {
+  console.log('404 Not Found:', req.url);
+  res.status(404).json({ error: 'Not Found' });
+});
+
 // 错误处理
 app.use((err, req, res, next) => {
-  console.error('Error:', err);
+  console.error('Server error:', err);
   res.status(500).json({ error: 'Server error' });
 });
 
