@@ -43,6 +43,7 @@ function ForgotPasswordPage() {
   const handleResetPassword = async (e) => {
     e.preventDefault();
     try {
+      console.log('Attempting password reset for:', email);
       const response = await fetch(`${API_URL}/auth/reset-password`, {
         method: 'POST',
         headers: {
@@ -52,16 +53,18 @@ function ForgotPasswordPage() {
       });
 
       const data = await response.json();
+      console.log('Reset password response:', data);
 
       if (!response.ok) {
         throw new Error(data.error || 'Failed to reset password');
       }
 
-      setMessage('Password reset successful!');
+      setMessage('Password reset successful! Please login with your new password.');
       setTimeout(() => {
         navigate('/login');
-      }, 1500);
+      }, 2000);
     } catch (error) {
+      console.error('Reset password error:', error);
       setMessage(error.message || 'Failed to reset password');
     }
   };

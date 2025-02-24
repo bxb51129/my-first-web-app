@@ -12,27 +12,26 @@ function LoginPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      console.log('Attempting login...');
+      console.log('Attempting login with:', { email, password });
       const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        credentials: 'include',
         body: JSON.stringify({ email, password })
       });
 
       console.log('Login response:', response);
 
+      const data = await response.json();
+      
       if (!response.ok) {
-        const data = await response.json();
         throw new Error(data.error || 'Login failed');
       }
 
-      const data = await response.json();
       console.log('Login successful:', data);
 
-      // 保存 token，确保添加 Bearer 前缀
+      // 保存 token
       localStorage.setItem('token', `Bearer ${data.token}`);
       
       setMessage('Login successful!');

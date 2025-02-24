@@ -60,11 +60,10 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log('Login attempt:', { email });
+    console.log('Login attempt for:', email);
 
     // 验证请求数据
     if (!email || !password) {
-      console.log('Missing email or password');
       return res.status(400).json({ 
         error: 'Please provide both email and password' 
       });
@@ -72,19 +71,17 @@ router.post('/login', async (req, res) => {
 
     // 查找用户
     const user = await User.findOne({ email });
-    console.log('User found:', user ? 'Yes' : 'No');
-    
     if (!user) {
-      console.log('User not found');
+      console.log('User not found:', email);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
     // 验证密码
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log('Password match:', isMatch ? 'Yes' : 'No');
-    
+    console.log('Password match:', isMatch);
+
     if (!isMatch) {
-      console.log('Password does not match');
+      console.log('Invalid password for:', email);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
@@ -95,9 +92,7 @@ router.post('/login', async (req, res) => {
       { expiresIn: '1d' }
     );
 
-    console.log('Login successful for user:', user.email);
-
-    // 返回成功响应
+    console.log('Login successful for:', email);
     res.status(200).json({
       message: 'Login successful',
       token,
@@ -108,9 +103,7 @@ router.post('/login', async (req, res) => {
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ 
-      error: 'An error occurred during login'
-    });
+    res.status(500).json({ error: 'Login failed' });
   }
 });
 
@@ -138,20 +131,41 @@ router.post('/check-email', async (req, res) => {
 router.post('/reset-password', async (req, res) => {
   try {
     const { email, newPassword } = req.body;
-    const user = await User.findOne({ email });
+    console.log('Reset password attempt for:', email);
 
+    // 验证请求数据
+    if (!email || !newPassword) {
+      return res.status(400).json({ 
+        error: 'Please provide both email and new password' 
+      });
+    }
+
+    // 查找用户
+    const user = await User.findOne({ email });
     if (!user) {
+      console.log('User not found for reset password:', email);
       return res.status(404).json({ error: 'User not found' });
     }
 
     // 加密新密码
     const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(newPassword, salt);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // 更新用户密码
+    user.password = hashedPassword;
     await user.save();
 
-    res.status(200).json({ message: 'Password reset successful' });
+    console.log('Password reset successful for:', email);
+    res.status(200).json({ 
+      message: 'Password reset successful',
+      success: true 
+    });
   } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('Reset password error:', error);
+    res.status(500).json({ 
+      error: 'Failed to reset password',
+      message: error.message 
+    });
   }
 });
 
