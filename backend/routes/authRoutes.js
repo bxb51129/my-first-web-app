@@ -61,6 +61,7 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     console.log('Login attempt for:', email);
+    console.log('Password length:', password.length);
 
     // 验证请求数据
     if (!email || !password) {
@@ -76,9 +77,18 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    console.log('Found user:', {
+      email: user.email,
+      passwordLength: user.password.length
+    });
+
     // 验证密码
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log('Password match:', isMatch);
+    console.log('Password comparison:', {
+      inputPassword: password,
+      hashedPasswordLength: user.password.length,
+      isMatch: isMatch
+    });
 
     if (!isMatch) {
       console.log('Invalid password for:', email);
@@ -132,11 +142,18 @@ router.post('/reset-password', async (req, res) => {
   try {
     const { email, newPassword } = req.body;
     console.log('Reset password attempt for:', email);
+    console.log('New password length:', newPassword.length);
 
     // 验证请求数据
     if (!email || !newPassword) {
       return res.status(400).json({ 
         error: 'Please provide both email and new password' 
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        error: 'Password must be at least 6 characters long'
       });
     }
 
@@ -150,10 +167,16 @@ router.post('/reset-password', async (req, res) => {
     // 加密新密码
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, salt);
+    console.log('Password hashed successfully');
 
     // 更新用户密码
     user.password = hashedPassword;
     await user.save();
+    console.log('User password updated in database');
+
+    // 尝试验证新密码
+    const verifyPassword = await bcrypt.compare(newPassword, user.password);
+    console.log('New password verification:', verifyPassword);
 
     console.log('Password reset successful for:', email);
     res.status(200).json({ 

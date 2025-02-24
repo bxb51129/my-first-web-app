@@ -100,6 +100,7 @@ function ForgotPasswordPage() {
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
                   minLength="6"
+                  placeholder="At least 6 characters"
                 />
               </label>
             </div>

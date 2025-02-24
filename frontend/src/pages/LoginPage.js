@@ -67,6 +67,8 @@ function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              minLength="6"
+              placeholder="Enter your password"
             />
           </label>
         </div>
