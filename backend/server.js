@@ -8,32 +8,32 @@ dotenv.config();
 
 const app = express();
 
-// CORS 配置
-const corsOptions = {
-  origin: 'https://my-first-web-app-sigma.vercel.app',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-};
-
 // 中间件
 app.use(express.json());
-app.use(cors(corsOptions));
+
+// CORS 配置
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', 'https://my-first-web-app-sigma.vercel.app');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+  // 处理 OPTIONS 请求
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  next();
+});
 
 // 请求日志
 app.use((req, res, next) => {
   console.log('Request:', {
     method: req.method,
     path: req.path,
-    body: req.body,
     headers: req.headers
   });
   next();
-});
-
-// 根路由
-app.get('/', (req, res) => {
-  res.json({ message: 'API is working' });
 });
 
 // API 路由

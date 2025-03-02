@@ -18,6 +18,8 @@ function LoginPage() {
         headers: {
           'Content-Type': 'application/json'
         },
+        credentials: 'include',
+        mode: 'cors',
         body: JSON.stringify({ email, password })
       });
 
