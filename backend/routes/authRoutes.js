@@ -19,22 +19,23 @@ router.post('/register', async (req, res) => {
     const { email, password } = req.body;
     
     if (!email || !password) {
-      console.log('Missing email or password');
-      return res.status(400).json({ error: 'Email and password are required' });
+      return res.status(400).json({
+        error: 'Email and password are required'
+      });
     }
 
     // 检查邮箱格式
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return res.status(400).json({ 
-        error: 'Please provide a valid email address' 
+      return res.status(400).json({
+        error: 'Please provide a valid email address'
       });
     }
 
     // 检查密码长度
     if (password.length < 6) {
-      return res.status(400).json({ 
-        error: 'Password must be at least 6 characters long' 
+      return res.status(400).json({
+        error: 'Password must be at least 6 characters long'
       });
     }
 
@@ -42,17 +43,26 @@ router.post('/register', async (req, res) => {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       console.log('User already exists:', email);
-      return res.status(400).json({ error: 'User already exists' });
+      return res.status(400).json({
+        error: 'User already exists'
+      });
     }
 
     // 创建新用户
     const user = new User({ email, password });
     await user.save();
 
-    res.status(201).json({ message: 'User registered successfully' });
+    console.log('User registered successfully:', email);
+    res.status(201).json({
+      message: 'User registered successfully',
+      userId: user._id
+    });
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ error: 'Registration failed' });
+    res.status(500).json({
+      error: 'Registration failed',
+      message: error.message
+    });
   }
 });
 

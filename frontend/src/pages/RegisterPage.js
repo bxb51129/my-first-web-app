@@ -25,11 +25,19 @@ function RegisterPage() {
 
       console.log('Response received:', response);
       
+      let data;
+      try {
+        data = await response.json();
+      } catch (error) {
+        console.error('Error parsing response:', error);
+        throw new Error('Server response was not valid JSON');
+      }
+      
       if (!response.ok) {
-        const data = await response.json();
         throw new Error(data.error || 'Registration failed');
       }
 
+      console.log('Registration successful:', data);
       setMessage('Registration successful!');
       setTimeout(() => {
         navigate('/login');

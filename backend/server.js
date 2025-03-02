@@ -36,28 +36,37 @@ app.use((req, res, next) => {
   next();
 });
 
+// 连接数据库
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 5000, // 5 秒超时
+  socketTimeoutMS: 45000, // 45 秒超时
+}).then(() => {
+  console.log('MongoDB connected');
+}).catch(err => {
+  console.error('MongoDB connection error:', err);
+});
+
 // API 路由
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/items', require('./routes/itemRoutes'));
 
+// 错误处理中间件
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(500).json({
+    error: 'Internal Server Error',
+    message: err.message
+  });
+});
+
 // 404 处理
 app.use((req, res) => {
-  console.log('404:', req.method, req.path);
   res.status(404).json({
     error: 'Not Found',
     path: req.path
   });
 });
-
-// 错误处理
-app.use((err, req, res, next) => {
-  console.error('Error:', err);
-  res.status(500).json({ error: err.message });
-});
-
-// 连接数据库
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB error:', err));
 
 module.exports = app;
