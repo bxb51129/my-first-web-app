@@ -20,6 +20,7 @@ router.post('/register', async (req, res) => {
     
     if (!email || !password) {
       return res.status(400).json({
+        success: false,
         error: 'Email and password are required'
       });
     }
@@ -28,6 +29,7 @@ router.post('/register', async (req, res) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({
+        success: false,
         error: 'Please provide a valid email address'
       });
     }
@@ -35,15 +37,16 @@ router.post('/register', async (req, res) => {
     // 检查密码长度
     if (password.length < 6) {
       return res.status(400).json({
+        success: false,
         error: 'Password must be at least 6 characters long'
       });
     }
 
     // 检查用户是否已存在
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email }).maxTimeMS(5000);
     if (existingUser) {
-      console.log('User already exists:', email);
       return res.status(400).json({
+        success: false,
         error: 'User already exists'
       });
     }
@@ -52,14 +55,15 @@ router.post('/register', async (req, res) => {
     const user = new User({ email, password });
     await user.save();
 
-    console.log('User registered successfully:', email);
     res.status(201).json({
+      success: true,
       message: 'User registered successfully',
       userId: user._id
     });
   } catch (error) {
     console.error('Registration error:', error);
     res.status(500).json({
+      success: false,
       error: 'Registration failed',
       message: error.message
     });

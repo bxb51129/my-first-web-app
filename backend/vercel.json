@@ -22,5 +22,11 @@
     "NODE_ENV": "production",
     "MONGODB_URI": "mongodb+srv://buw1123:bbyyww1123@cluster0.o0hak.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
     "JWT_SECRET": "jwt_secret_631_your_app_2024"
+  },
+  "functions": {
+    "server.js": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
   }
 } 
