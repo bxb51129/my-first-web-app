@@ -8,32 +8,33 @@ dotenv.config();
 
 const app = express();
 
-// 允许的域名列表
-const allowedOrigins = [
-  'https://my-first-web-app-sigma.vercel.app',
-  'https://my-first-web-99rwyyyaa-byw1123s-projects.vercel.app',
-  'https://my-first-web-app-nwlr.vercel.app'
-];
-
-// CORS 配置
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
-  
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-  next();
-});
-
 // 中间件
 app.use(express.json());
+
+// CORS 配置
+const corsOptions = {
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      'https://my-first-web-app-sigma.vercel.app',
+      'https://my-first-web-99rwyyyaa-byw1123s-projects.vercel.app',
+      'http://localhost:3000'
+    ];
+    
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
+
+// 预检请求
+app.options('*', cors(corsOptions));
 
 // 请求日志
 app.use((req, res, next) => {
@@ -83,9 +84,15 @@ app.get('/', (req, res) => {
   res.json({ message: 'API is working' });
 });
 
-// 错误处理中间件
+// 错误处理
 app.use((err, req, res, next) => {
   console.error('Error:', err);
+  if (err.message === 'Not allowed by CORS') {
+    return res.status(403).json({
+      error: 'CORS Error',
+      message: 'Origin not allowed'
+    });
+  }
   res.status(500).json({
     error: 'Internal Server Error',
     message: err.message

@@ -20,7 +20,10 @@ function RegisterPage() {
         },
         credentials: 'include',
         mode: 'cors',
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ 
+          email, 
+          password 
+        })
       });
 
       console.log('Response received:', response);
