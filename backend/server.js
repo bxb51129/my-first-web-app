@@ -8,29 +8,39 @@ dotenv.config();
 
 const app = express();
 
-// 中间件
-app.use(express.json());
+// 允许的域名列表
+const allowedOrigins = [
+  'https://my-first-web-app-sigma.vercel.app',
+  'https://my-first-web-99rwyyyaa-byw1123s-projects.vercel.app',
+  'https://my-first-web-app-nwlr.vercel.app'
+];
 
 // CORS 配置
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'https://my-first-web-app-sigma.vercel.app');
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
 
-  // 处理 OPTIONS 请求
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
-
   next();
 });
+
+// 中间件
+app.use(express.json());
 
 // 请求日志
 app.use((req, res, next) => {
   console.log('Request:', {
     method: req.method,
     path: req.path,
+    origin: req.headers.origin,
     headers: req.headers
   });
   next();
@@ -65,8 +75,8 @@ mongoose.connection.on('disconnected', () => {
 });
 
 // API 路由
-app.use('/auth', require('./routes/authRoutes'));
-app.use('/items', require('./routes/itemRoutes'));
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/items', require('./routes/itemRoutes'));
 
 // 根路由
 app.get('/', (req, res) => {
