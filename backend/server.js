@@ -1,6 +1,10 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+
+// 加载环境变量
+dotenv.config();
 
 const app = express();
 
@@ -9,17 +13,12 @@ const corsOptions = {
   origin: 'https://my-first-web-app-sigma.vercel.app',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-  preflightContinue: false,
-  optionsSuccessStatus: 204
+  credentials: true
 };
 
-// 基本中间件
+// 中间件
 app.use(express.json());
 app.use(cors(corsOptions));
-
-// 预检请求处理
-app.options('*', cors(corsOptions));
 
 // 请求日志
 app.use((req, res, next) => {
@@ -32,9 +31,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// 测试路由
-app.get('/test', (req, res) => {
-  res.json({ message: 'Backend is working' });
+// 根路由
+app.get('/', (req, res) => {
+  res.json({ message: 'API is working' });
 });
 
 // API 路由
