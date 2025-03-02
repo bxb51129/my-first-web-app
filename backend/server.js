@@ -11,19 +11,14 @@ const app = express();
 // 基本中间件
 app.use(express.json());
 
-// CORS 配置
-app.use((req, res, next) => {
-  // 允许所有源
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-
-  // 处理预检请求
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
-  next();
-});
+// CORS 中间件
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204
+}));
 
 // 请求日志
 app.use((req, res, next) => {
@@ -34,34 +29,6 @@ app.use((req, res, next) => {
     headers: req.headers
   });
   next();
-});
-
-// 连接数据库
-const connectDB = async () => {
-  try {
-    await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 10000,
-      socketTimeoutMS: 45000,
-    });
-    console.log('MongoDB connected');
-  } catch (err) {
-    console.error('MongoDB connection error:', err);
-    process.exit(1);
-  }
-};
-
-connectDB();
-
-// 监听数据库连接事件
-mongoose.connection.on('error', err => {
-  console.error('MongoDB error:', err);
-});
-
-mongoose.connection.on('disconnected', () => {
-  console.log('MongoDB disconnected');
-  connectDB();
 });
 
 // API 路由
@@ -89,5 +56,10 @@ app.use((err, req, res, next) => {
     message: err.message
   });
 });
+
+// 数据库连接
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.error('MongoDB error:', err));
 
 module.exports = app;
