@@ -65,8 +65,13 @@ mongoose.connection.on('disconnected', () => {
 });
 
 // API 路由
-app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/items', require('./routes/itemRoutes'));
+app.use('/auth', require('./routes/authRoutes'));
+app.use('/items', require('./routes/itemRoutes'));
+
+// 根路由
+app.get('/', (req, res) => {
+  res.json({ message: 'API is working' });
+});
 
 // 错误处理中间件
 app.use((err, req, res, next) => {
@@ -79,6 +84,7 @@ app.use((err, req, res, next) => {
 
 // 404 处理
 app.use((req, res) => {
+  console.log('404:', req.method, req.path);
   res.status(404).json({
     error: 'Not Found',
     path: req.path
