@@ -12,7 +12,27 @@ const connectDB = async () => {
     
     await mongoose.connect(uri, {
       useNewUrlParser: true,
-      useUnifiedTopology: true
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 10000,
+      socketTimeoutMS: 45000,
+      family: 4,
+      retryWrites: true,
+      w: 'majority',
+      authSource: 'admin'
+    });
+
+    console.log('MongoDB connected successfully');
+    
+    // 添加事件监听器
+    mongoose.connection.on('error', err => {
+      console.error('MongoDB error:', err);
+    });
+
+    mongoose.connection.on('disconnected', () => {
+      console.log('MongoDB disconnected, trying to reconnect...');
+      connectDB().catch(err => {
+        console.error('Reconnection error:', err);
+      });
     });
 
     return true;
