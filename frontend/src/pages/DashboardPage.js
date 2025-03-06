@@ -23,13 +23,16 @@ function DashboardPage() {
 
       const response = await fetch(`${API_URL}/items`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          'Authorization': token,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        credentials: 'include'
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch tasks');
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to fetch tasks');
       }
 
       const data = await response.json();
@@ -52,14 +55,17 @@ function DashboardPage() {
       const response = await fetch(`${API_URL}/items`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Authorization': token,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({ title, description })
       });
 
       if (!response.ok) {
-        throw new Error('Failed to add task');
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to add task');
       }
 
       const newTask = await response.json();

@@ -11,13 +11,12 @@ const app = express();
 // 基本中间件
 app.use(express.json());
 
-// CORS 中间件
+// CORS 配置
 app.use(cors({
-  origin: '*',
+  origin: 'https://my-first-web-app-sigma.vercel.app',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-  preflightContinue: false,
-  optionsSuccessStatus: 204
+  credentials: true
 }));
 
 // 请求日志
@@ -25,15 +24,15 @@ app.use((req, res, next) => {
   console.log('Request:', {
     method: req.method,
     path: req.path,
-    origin: req.headers.origin,
-    headers: req.headers
+    headers: req.headers,
+    body: req.body
   });
   next();
 });
 
 // API 路由
-app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/items', require('./routes/itemRoutes'));
+app.use('/auth', require('./routes/authRoutes'));
+app.use('/items', require('./routes/itemRoutes'));
 
 // 根路由
 app.get('/', (req, res) => {
@@ -42,6 +41,7 @@ app.get('/', (req, res) => {
 
 // 404 处理
 app.use((req, res) => {
+  console.log('404:', req.method, req.path);
   res.status(404).json({
     error: 'Not Found',
     path: req.path
