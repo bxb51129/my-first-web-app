@@ -32,6 +32,7 @@ const connectDB = async () => {
       console.log('MongoDB disconnected, trying to reconnect...');
       connectDB().catch(err => {
         console.error('Reconnection error:', err);
+        console.log('Connecting to MongoDB. with URL:' + uri);
       });
     });
 
