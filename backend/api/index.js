@@ -10,12 +10,20 @@ const app = express();
 // 基本中间件
 app.use(express.json());
 
-// CORS 配置 - 使用最简单的配置
-app.use(cors());
+// CORS 配置
+app.use((req, res, next) => {
+  // 允许所有源
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
 
-// API 路由
-app.use('/api/auth', require('../routes/authRoutes'));
-app.use('/api/items', require('../routes/itemRoutes'));
+  // 处理预检请求
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+
+  next();
+});
 
 // 请求日志
 app.use((req, res, next) => {
@@ -27,6 +35,10 @@ app.use((req, res, next) => {
   });
   next();
 });
+
+// API 路由
+app.use('/api/auth', require('../routes/authRoutes'));
+app.use('/api/items', require('../routes/itemRoutes'));
 
 // 根路由
 app.get('/', (req, res) => {
@@ -55,47 +67,17 @@ app.use((err, req, res, next) => {
 const connectDB = async () => {
   try {
     const uri = process.env.MONGODB_URI;
-    
     if (!uri) {
       throw new Error('MONGODB_URI is not defined');
     }
-
-    console.log('Connecting to MongoDB...');
-    
-    await mongoose.connect(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 10000,
-      socketTimeoutMS: 45000,
-      family: 4,
-      retryWrites: true,
-      w: 'majority',
-      authSource: 'admin'
-    });
-
-    console.log('MongoDB connected successfully');
-    return true;
+    await mongoose.connect(uri);
+    console.log('MongoDB connected');
   } catch (error) {
     console.error('MongoDB connection error:', error);
     throw error;
   }
 };
 
-// 初始连接
-connectDB().catch(err => {
-  console.error('Initial connection error:', err);
-});
-
-// 监听连接事件
-mongoose.connection.on('error', err => {
-  console.error('MongoDB error:', err);
-});
-
-mongoose.connection.on('disconnected', () => {
-  console.log('MongoDB disconnected, trying to reconnect...');
-  connectDB().catch(err => {
-    console.error('Reconnection error:', err);
-  });
-});
+connectDB();
 
 module.exports = app; 
