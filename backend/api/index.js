@@ -22,5 +22,10 @@ module.exports = (req, res) => {
     body: req.body
   });
 
+  // 修改请求路径
+  if (req.url.startsWith('/auth/') || req.url.startsWith('/items/')) {
+    req.url = '/api' + req.url;
+  }
+
   return app(req, res);
 }; 

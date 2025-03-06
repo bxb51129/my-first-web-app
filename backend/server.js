@@ -31,8 +31,8 @@ app.use((req, res, next) => {
 });
 
 // API 路由
-app.use('/auth', require('./routes/authRoutes'));
-app.use('/items', require('./routes/itemRoutes'));
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/items', require('./routes/itemRoutes'));
 
 // 根路由
 app.get('/', (req, res) => {
