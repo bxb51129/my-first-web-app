@@ -1,42 +1,61 @@
-const app = require('../server');
+const express = require('express');
+const cors = require('cors');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+
+dotenv.config();
+
+const app = express();
+
+// 基本中间件
+app.use(express.json());
+
+// CORS 配置
+const corsOptions = {
+  origin: 'https://my-first-web-app-sigma.vercel.app',
+  methods: ['GET', 'POST', 'PUT', DELETE, 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  credentials: true,
+  preflightContinue: false,
+  optionsSuccessStatus: 204
+};
+
+app.use(cors(corsOptions));
+
+// 预检请求处理
+app.options('*', cors(corsOptions));
+
+// API 路由
+app.use('/api/auth', require('../routes/authRoutes'));
+app.use('/api/items', require('../routes/itemRoutes'));
+
+// 根路由
+app.get('/', (req, res) => {
+  res.json({ message: 'API is working' });
+});
+
+// 404 处理
+app.use((req, res) => {
+  console.log('404:', req.method, req.path);
+  res.status(404).json({
+    error: 'Not Found',
+    path: req.path
+  });
+});
+
+// 错误处理
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(500).json({
+    error: 'Internal Server Error',
+    message: err.message
+  });
+});
+
+// 数据库连接
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.error('MongoDB error:', err));
 
 // 导出处理函数
-module.exports = async (req, res) => {
-  try {
-    // 添加 CORS 头
-    res.setHeader('Access-Control-Allow-Origin', 'https://my-first-web-app-sigma.vercel.app');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-
-    // 处理 OPTIONS 请求
-    if (req.method === 'OPTIONS') {
-      res.status(200).end();
-      return;
-    }
-
-    // 打印请求信息
-    console.log('Request:', {
-      method: req.method,
-      url: req.url,
-      headers: req.headers,
-      body: req.body
-    });
-
-    // 确保请求路径正确
-    if (!req.url.startsWith('/api/')) {
-      req.url = '/api' + req.url;
-    }
-
-    // 使用 Promise 包装 app 调用
-    await new Promise((resolve, reject) => {
-      app(req, res, (err) => {
-        if (err) reject(err);
-        resolve();
-      });
-    });
-  } catch (error) {
-    console.error('Error handling request:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-}; 
+module.exports = app; 
