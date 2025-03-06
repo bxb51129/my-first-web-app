@@ -14,15 +14,18 @@
   ],
   "headers": [
     {
-      "source": "/api/auth/register",
+      "source": "/api/(.*)",
       "headers": [
-        { "key": "Access-Control-Allow-Origin", "value": "https://my-first-web-app-sigma.vercel.app" }
+        { "key": "Access-Control-Allow-Origin", "value": "https://my-first-web-app-sigma.vercel.app" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, PUT, DELETE, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization, Accept" },
+        { "key": "Access-Control-Allow-Credentials", "value": "true" }
       ]
     }
   ],
   "env": {
     "NODE_ENV": "production",
-    "MONGODB_URI": "mongodb+srv://buw1123:bbyyww1123@cluster0.o0hak.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+    "MONGODB_URI": "mongodb+srv://buw1123:bbyyww1123@cluster0.o0hak.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
     "JWT_SECRET": "jwt_secret_631_your_app_2024"
   },
   "functions": {
