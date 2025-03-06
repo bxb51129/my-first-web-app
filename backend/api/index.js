@@ -11,19 +11,36 @@ const app = express();
 app.use(express.json());
 
 // CORS 配置
-const corsOptions = {
-  origin: 'https://my-first-web-app-sigma.vercel.app',
-  methods: ['GET', 'POST', 'PUT', DELETE, 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-  credentials: true,
-  preflightContinue: false,
-  optionsSuccessStatus: 204
-};
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', 'https://my-first-web-app-sigma.vercel.app');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
 
-app.use(cors(corsOptions));
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  next();
+});
 
-// 预检请求处理
-app.options('*', cors(corsOptions));
+// 请求日志
+app.use((req, res, next) => {
+  console.log('Request:', {
+    method: req.method,
+    path: req.path,
+    headers: req.headers,
+    body: req.body
+  });
+  next();
+});
+
+// 设置超时
+app.use((req, res, next) => {
+  res.setTimeout(30000, () => {
+    res.status(504).json({ error: 'Request timeout' });
+  });
+  next();
+});
 
 // API 路由
 app.use('/api/auth', require('../routes/authRoutes'));
@@ -53,9 +70,14 @@ app.use((err, req, res, next) => {
 });
 
 // 数据库连接
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB error:', err));
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 45000,
+})
+.then(() => console.log('MongoDB connected'))
+.catch(err => console.error('MongoDB error:', err));
 
 // 导出处理函数
 module.exports = app; 
