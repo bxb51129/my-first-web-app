@@ -72,30 +72,49 @@ app.use((err, req, res, next) => {
 // 数据库连接
 const connectDB = async () => {
   try {
+    const uri = process.env.MONGODB_URI;
+    
+    if (!uri) {
+      throw new Error('MONGODB_URI is not defined');
+    }
+
     console.log('Connecting to MongoDB...');
-    await mongoose.connect(process.env.MONGODB_URI, {
+    
+    await mongoose.connect(uri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       serverSelectionTimeoutMS: 10000,
       socketTimeoutMS: 45000,
-      family: 4
+      family: 4,
+      retryWrites: true,
+      w: 'majority',
+      authSource: 'admin'
     });
+
     console.log('MongoDB connected successfully');
+    return true;
   } catch (error) {
     console.error('MongoDB connection error:', error);
-    process.exit(1);
+    // 不要直接退出进程，而是抛出错误
+    throw error;
   }
 };
 
-connectDB();
+// 初始连接
+connectDB().catch(err => {
+  console.error('Initial connection error:', err);
+});
 
+// 监听连接事件
 mongoose.connection.on('error', err => {
   console.error('MongoDB error:', err);
 });
 
 mongoose.connection.on('disconnected', () => {
   console.log('MongoDB disconnected, trying to reconnect...');
-  connectDB();
+  connectDB().catch(err => {
+    console.error('Reconnection error:', err);
+  });
 });
 
 // 导出处理函数
