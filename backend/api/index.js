@@ -10,28 +10,12 @@ const app = express();
 // 基本中间件
 app.use(express.json());
 
-// CORS 配置
-const corsOptions = {
-  origin: 'https://my-first-web-app-sigma.vercel.app',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-  credentials: true,
-  maxAge: 86400 // 预检请求缓存24小时
-};
+// CORS 配置 - 使用最简单的配置
+app.use(cors());
 
-app.use(cors(corsOptions));
-
-// 预检请求处理
-app.options('*', cors(corsOptions));
-
-// 额外的 CORS 头
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://my-first-web-app-sigma.vercel.app');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  next();
-});
+// API 路由
+app.use('/api/auth', require('../routes/authRoutes'));
+app.use('/api/items', require('../routes/itemRoutes'));
 
 // 请求日志
 app.use((req, res, next) => {
@@ -43,18 +27,6 @@ app.use((req, res, next) => {
   });
   next();
 });
-
-// 设置超时
-app.use((req, res, next) => {
-  res.setTimeout(30000, () => {
-    res.status(504).json({ error: 'Request timeout' });
-  });
-  next();
-});
-
-// API 路由
-app.use('/api/auth', require('../routes/authRoutes'));
-app.use('/api/items', require('../routes/itemRoutes'));
 
 // 根路由
 app.get('/', (req, res) => {
@@ -105,7 +77,6 @@ const connectDB = async () => {
     return true;
   } catch (error) {
     console.error('MongoDB connection error:', error);
-    // 不要直接退出进程，而是抛出错误
     throw error;
   }
 };
@@ -127,5 +98,4 @@ mongoose.connection.on('disconnected', () => {
   });
 });
 
-// 导出处理函数
 module.exports = app; 

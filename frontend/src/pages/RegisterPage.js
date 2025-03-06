@@ -18,12 +18,8 @@ function RegisterPage() {
       const response = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Origin': 'https://my-first-web-app-sigma.vercel.app'
+          'Content-Type': 'application/json'
         },
-        credentials: 'include',
-        mode: 'cors',
         body: JSON.stringify({ 
           email, 
           password 
@@ -31,22 +27,14 @@ function RegisterPage() {
       });
 
       console.log('Response status:', response.status);
-      console.log('Response headers:', response.headers);
       
-      let data;
-      try {
-        data = await response.json();
-        console.log('Response data:', data);
-      } catch (error) {
-        console.error('Error parsing response:', error);
-        throw new Error('Server response was not valid JSON');
-      }
+      const data = await response.json();
+      console.log('Response data:', data);
       
       if (!response.ok) {
         throw new Error(data.error || 'Registration failed');
       }
 
-      console.log('Registration successful:', data);
       setMessage('Registration successful!');
       setTimeout(() => {
         navigate('/login');
