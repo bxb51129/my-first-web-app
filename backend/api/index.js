@@ -11,19 +11,17 @@ const app = express();
 app.use(express.json());
 
 // CORS 配置
-app.use((req, res, next) => {
-  // 允许所有源
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
+const corsOptions = {
+  origin: 'https://my-first-web-app-sigma.vercel.app',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  credentials: true
+};
 
-  // 处理预检请求
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
+app.use(cors(corsOptions));
 
-  next();
-});
+// 预检请求处理
+app.options('*', cors(corsOptions));
 
 // 请求日志
 app.use((req, res, next) => {
@@ -70,14 +68,24 @@ const connectDB = async () => {
     if (!uri) {
       throw new Error('MONGODB_URI is not defined');
     }
-    await mongoose.connect(uri);
-    console.log('MongoDB connected');
+    console.log('Connecting to MongoDB...');
+    await mongoose.connect(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 10000,
+      socketTimeoutMS: 45000,
+      family: 4
+    });
+    console.log('MongoDB connected successfully');
   } catch (error) {
     console.error('MongoDB connection error:', error);
     throw error;
   }
 };
 
-connectDB();
+// 初始连接
+connectDB().catch(err => {
+  console.error('Initial connection error:', err);
+});
 
 module.exports = app; 
