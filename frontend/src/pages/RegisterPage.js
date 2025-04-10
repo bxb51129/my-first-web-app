@@ -20,6 +20,7 @@ function RegisterPage() {
         headers: {
           'Content-Type': 'application/json'
         },
+        mode: 'cors',
         body: JSON.stringify({ 
           email, 
           password 
@@ -28,8 +29,7 @@ function RegisterPage() {
 
       console.log('Response:', {
         status: response.status,
-        statusText: response.statusText,
-        headers: Object.fromEntries(response.headers)
+        statusText: response.statusText
       });
 
       const data = await response.json();

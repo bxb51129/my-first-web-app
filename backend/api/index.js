@@ -11,23 +11,12 @@ const app = express();
 app.use(express.json());
 
 // CORS 配置
-app.use((req, res, next) => {
-  // 设置 CORS 头
-  const origin = req.headers.origin;
-  if (origin === 'https://my-first-web-app-sigma.vercel.app') {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-  }
-
-  // 处理预检请求
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  next();
-});
+app.use(cors({
+  origin: 'https://my-first-web-app-sigma.vercel.app',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  credentials: true
+}));
 
 // 调试中间件
 app.use((req, res, next) => {
@@ -77,7 +66,6 @@ const connectDB = async () => {
     console.log('MongoDB connected');
   } catch (error) {
     console.error('MongoDB connection error:', error);
-    console.error('Connection string:', process.env.MONGODB_URI.replace(/:[^:@]+@/, ':****@'));
   }
 };
 
