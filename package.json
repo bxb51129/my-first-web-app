@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "express": "^4.21.2",
-    "mongodb": "^6.13.1",
+    "mongodb": "^6.15.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "web-vitals": "^4.2.4"
