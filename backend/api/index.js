@@ -34,20 +34,11 @@ const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
-      useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 30000,
-      socketTimeoutMS: 45000,
-      authSource: 'admin'
+      useUnifiedTopology: true
     });
     console.log('MongoDB connected');
   } catch (error) {
     console.error('MongoDB connection error:', error);
-    // 打印连接字符串（隐藏密码）
-    const sanitizedUri = process.env.MONGODB_URI.replace(
-      /(mongodb\+srv:\/\/[^:]+:)([^@]+)(@.+)/,
-      '$1****$3'
-    );
-    console.error('Connection string:', sanitizedUri);
   }
 };
 
