@@ -12,16 +12,40 @@ app.use(express.json());
 
 // CORS 配置
 app.use((req, res, next) => {
+  // 在每个响应中添加 CORS 头
   res.header('Access-Control-Allow-Origin', 'https://my-first-web-app-sigma.vercel.app');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
+  res.header('Access-Control-Allow-Headers', '*');
   res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Max-Age', '86400'); // 24 hours
 
   // 处理预检请求
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    console.log('Handling OPTIONS request');
+    return res.status(204).end();
   }
 
+  // 打印请求信息
+  console.log('Incoming request:', {
+    method: req.method,
+    path: req.path,
+    origin: req.headers.origin,
+    headers: req.headers
+  });
+
+  next();
+});
+
+// 路由处理前的中间件
+app.use((req, res, next) => {
+  // 确保响应头被设置
+  res.set({
+    'Access-Control-Allow-Origin': 'https://my-first-web-app-sigma.vercel.app',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': '*',
+    'Access-Control-Allow-Credentials': 'true',
+    'Access-Control-Max-Age': '86400'
+  });
   next();
 });
 
