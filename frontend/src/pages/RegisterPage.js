@@ -18,7 +18,9 @@ function RegisterPage() {
       const response = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Origin': 'https://my-first-web-app-sigma.vercel.app'
         },
         mode: 'cors',
         body: JSON.stringify({ 
@@ -29,7 +31,8 @@ function RegisterPage() {
 
       console.log('Response:', {
         status: response.status,
-        statusText: response.statusText
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers)
       });
 
       const data = await response.json();
