@@ -12,7 +12,7 @@ app.use(express.json());
 
 // CORS 配置
 app.use(cors({
-  origin: 'https://my-first-web-app-sigma.vercel.app',
+  origin: 'https://my-first-web-5bqjh0s1a-byw1123s-projects.vercel.app',
   credentials: true
 }));
 
