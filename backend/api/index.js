@@ -11,19 +11,10 @@ const app = express();
 app.use(express.json());
 
 // CORS 配置
-app.use((req, res, next) => {
-  // 设置 CORS 头
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', '*');
-
-  // 处理预检请求
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  next();
-});
+app.use(cors({
+  origin: 'https://my-first-web-app-sigma.vercel.app',
+  credentials: true
+}));
 
 // API 路由
 app.use('/api/auth', require('../routes/authRoutes'));
@@ -32,10 +23,7 @@ app.use('/api/items', require('../routes/itemRoutes'));
 // 数据库连接
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    });
+    await mongoose.connect(process.env.MONGODB_URI);
     console.log('MongoDB connected');
   } catch (error) {
     console.error('MongoDB connection error:', error);
