@@ -43,30 +43,32 @@ router.post('/register', async (req, res) => {
     }
 
     // 检查用户是否已存在
-    const existingUser = await User.findOne({ email }).maxTimeMS(5000);
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        error: 'User already exists'
-      });
+      return res.status(400).json({ error: 'User already exists' });
     }
 
     // 创建新用户
-    const user = new User({ email, password });
-    await user.save();
+    const user = new User({
+      email,
+      password
+    });
 
+    // 保存用户
+    await user.save();
+    console.log('User saved successfully:', user);
+
+    // 返回成功响应
     res.status(201).json({
-      success: true,
       message: 'User registered successfully',
-      userId: user._id
+      user: {
+        id: user._id,
+        email: user.email
+      }
     });
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Registration failed',
-      message: error.message
-    });
+    res.status(500).json({ error: 'Registration failed', details: error.message });
   }
 });
 
