@@ -11,17 +11,19 @@ const app = express();
 app.use(express.json());
 
 // CORS 配置
-const corsOptions = {
-  origin: 'https://my-first-web-app-sigma.vercel.app',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-  credentials: true
-};
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'https://my-first-web-app-sigma.vercel.app');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
+  res.header('Access-Control-Allow-Credentials', 'true');
 
-app.use(cors(corsOptions));
+  // 处理预检请求
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
 
-// 预检请求处理
-app.options('*', cors(corsOptions));
+  next();
+});
 
 // 请求日志
 app.use((req, res, next) => {
