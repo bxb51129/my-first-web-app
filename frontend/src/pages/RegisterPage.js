@@ -19,8 +19,7 @@ function RegisterPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Origin': 'https://my-first-web-app-sigma.vercel.app'
+          'Accept': 'application/json'
         },
         credentials: 'include',
         mode: 'cors',
