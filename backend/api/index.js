@@ -12,8 +12,10 @@ app.use(express.json());
 
 // CORS 配置
 app.use(cors({
-  origin: 'https://my-first-web-5bqjh0s1a-byw1123s-projects.vercel.app',
-  credentials: true
+  origin: '*',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
 }));
 
 // API 路由
