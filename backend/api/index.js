@@ -10,8 +10,20 @@ const app = express();
 // 基本中间件
 app.use(express.json());
 
-// CORS 配置 - 允许所有来源
-app.use(cors());
+// CORS 配置
+app.use((req, res, next) => {
+  // 设置 CORS 头
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', '*');
+
+  // 处理预检请求
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  next();
+});
 
 // API 路由
 app.use('/api/auth', require('../routes/authRoutes'));
