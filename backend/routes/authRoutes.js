@@ -17,44 +17,30 @@ router.post('/register', async (req, res) => {
     console.log('Registration request received:', req.body);
     
     const { email, password } = req.body;
-    
+
+    // 验证输入
     if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        error: 'Email and password are required'
-      });
-    }
-
-    // 检查邮箱格式
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({
-        success: false,
-        error: 'Please provide a valid email address'
-      });
-    }
-
-    // 检查密码长度
-    if (password.length < 6) {
-      return res.status(400).json({
-        success: false,
-        error: 'Password must be at least 6 characters long'
-      });
+      console.log('Missing email or password');
+      return res.status(400).json({ error: 'Email and password are required' });
     }
 
     // 检查用户是否已存在
+    console.log('Checking if user exists...');
     const existingUser = await User.findOne({ email });
     if (existingUser) {
+      console.log('User already exists:', email);
       return res.status(400).json({ error: 'User already exists' });
     }
 
     // 创建新用户
+    console.log('Creating new user...');
     const user = new User({
       email,
       password
     });
 
     // 保存用户
+    console.log('Saving user...');
     await user.save();
     console.log('User saved successfully:', user);
 
@@ -68,7 +54,12 @@ router.post('/register', async (req, res) => {
     });
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ error: 'Registration failed', details: error.message });
+    console.error('Error stack:', error.stack);
+    res.status(500).json({ 
+      error: 'Registration failed', 
+      details: error.message,
+      stack: error.stack
+    });
   }
 });
 
