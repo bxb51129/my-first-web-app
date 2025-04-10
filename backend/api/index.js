@@ -11,19 +11,32 @@ const app = express();
 app.use(express.json());
 
 // CORS 配置
+const corsOptions = {
+  origin: 'https://my-first-web-app-sigma.vercel.app',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  credentials: true
+};
+
+// 应用 CORS
+app.use(cors(corsOptions));
+
+// 确保 CORS 头部被设置
 app.use((req, res, next) => {
-  // 允许特定域名
   res.header('Access-Control-Allow-Origin', 'https://my-first-web-app-sigma.vercel.app');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
   res.header('Access-Control-Allow-Credentials', 'true');
-
-  // 处理预检请求
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
-
   next();
+});
+
+// 处理 OPTIONS 请求
+app.options('*', (req, res) => {
+  res.header('Access-Control-Allow-Origin', 'https://my-first-web-app-sigma.vercel.app');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.sendStatus(200);
 });
 
 // 调试中间件
@@ -52,6 +65,11 @@ app.use((req, res, next) => {
 // API 路由
 app.use('/api/auth', require('../routes/authRoutes'));
 app.use('/api/items', require('../routes/itemRoutes'));
+
+// 处理 favicon.ico 请求
+app.get('/favicon.ico', (req, res) => {
+  res.status(204).end(); // 返回空响应
+});
 
 // 错误处理
 app.use((err, req, res, next) => {

@@ -8,7 +8,7 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
+      "src": "/(.*)",
       "dest": "/api/index.js",
       "headers": {
         "Access-Control-Allow-Origin": "https://my-first-web-app-sigma.vercel.app",
@@ -16,10 +16,6 @@
         "Access-Control-Allow-Headers": "Content-Type, Authorization, Accept",
         "Access-Control-Allow-Credentials": "true"
       }
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/api/index.js"
     }
   ],
   "env": {
