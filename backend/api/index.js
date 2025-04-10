@@ -10,29 +10,8 @@ const app = express();
 // 基本中间件
 app.use(express.json());
 
-// CORS 配置
-const corsOptions = {
-  origin: 'https://my-first-web-app-sigma.vercel.app',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-  credentials: true,
-  maxAge: 86400
-};
-
-// 应用 CORS 配置
-app.use(cors(corsOptions));
-
-// 确保 CORS 头部被设置
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://my-first-web-app-sigma.vercel.app');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  next();
-});
-
-// 处理 OPTIONS 请求
-app.options('*', cors(corsOptions));
+// 简单的 CORS 配置
+app.use(cors());
 
 // API 路由
 app.use('/api/auth', require('../routes/authRoutes'));
