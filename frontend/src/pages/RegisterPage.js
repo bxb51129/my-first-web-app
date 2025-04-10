@@ -18,20 +18,20 @@ function RegisterPage() {
       const response = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Content-Type': 'application/json'
         },
-        credentials: 'include',
-        mode: 'cors',
         body: JSON.stringify({ 
           email, 
           password 
         })
       });
 
-      console.log('Response status:', response.status);
-      console.log('Response headers:', Object.fromEntries(response.headers));
-      
+      console.log('Response:', {
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers)
+      });
+
       const data = await response.json();
       console.log('Response data:', data);
       

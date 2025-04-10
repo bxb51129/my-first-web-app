@@ -10,49 +10,76 @@ const app = express();
 // 基本中间件
 app.use(express.json());
 
-// 简单的 CORS 配置
-app.use(cors());
+// CORS 配置
+app.use((req, res, next) => {
+  // 允许特定域名
+  const allowedOrigins = ['https://my-first-web-app-sigma.vercel.app'];
+  const origin = req.headers.origin;
+  
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+
+  // 其他 CORS 头
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+  // 处理预检请求
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  next();
+});
+
+// 调试中间件
+app.use((req, res, next) => {
+  console.log('Request:', {
+    method: req.method,
+    url: req.url,
+    headers: req.headers,
+    body: req.body
+  });
+
+  // 捕获响应
+  const oldSend = res.send;
+  res.send = function(data) {
+    console.log('Response:', {
+      status: res.statusCode,
+      headers: res._headers,
+      body: data
+    });
+    oldSend.apply(res, arguments);
+  };
+
+  next();
+});
 
 // API 路由
 app.use('/api/auth', require('../routes/authRoutes'));
 app.use('/api/items', require('../routes/itemRoutes'));
 
+// 错误处理
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(500).json({
+    error: 'Internal Server Error',
+    message: err.message
+  });
+});
+
 // 数据库连接
 const connectDB = async () => {
   try {
-    const uri = process.env.MONGODB_URI;
-    console.log('Connecting to MongoDB...');
-    
-    await mongoose.connect(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 30000,
-      socketTimeoutMS: 45000,
-      ssl: true,
-      authSource: 'admin',
-      retryWrites: true,
-      w: 'majority'
-    });
-    
-    console.log('MongoDB connected successfully');
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log('MongoDB connected');
   } catch (error) {
     console.error('MongoDB connection error:', error);
-    // 不要退出进程，让应用继续运行
-    console.error('Connection failed, but server will continue running');
+    console.error('Connection string:', process.env.MONGODB_URI.replace(/:[^:@]+@/, ':****@'));
   }
 };
 
-// 初始连接
 connectDB();
-
-// 监听连接事件
-mongoose.connection.on('error', err => {
-  console.error('MongoDB error:', err);
-});
-
-mongoose.connection.on('disconnected', () => {
-  console.log('MongoDB disconnected, trying to reconnect...');
-  setTimeout(connectDB, 5000);
-});
 
 module.exports = app; 
