@@ -74,13 +74,18 @@ const connectDB = async () => {
     await mongoose.connect(uri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 10000,
+      serverSelectionTimeoutMS: 30000,
       socketTimeoutMS: 45000,
-      family: 4
+      ssl: true,
+      replicaSet: 'atlas-n31l82-shard-0',
+      authSource: 'admin',
+      retryWrites: true,
+      w: 'majority'
     });
     console.log('MongoDB connected successfully');
   } catch (error) {
     console.error('MongoDB connection error:', error);
+    console.error('Connection string:', process.env.MONGODB_URI.replace(/:[^:@]+@/, ':****@'));
     throw error;
   }
 };
@@ -88,6 +93,16 @@ const connectDB = async () => {
 // 初始连接
 connectDB().catch(err => {
   console.error('Initial connection error:', err);
+});
+
+// 添加重连机制
+mongoose.connection.on('disconnected', () => {
+  console.log('MongoDB disconnected, trying to reconnect...');
+  setTimeout(() => {
+    connectDB().catch(err => {
+      console.error('Reconnection error:', err);
+    });
+  }, 5000);
 });
 
 module.exports = app; 
