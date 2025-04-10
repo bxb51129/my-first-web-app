@@ -11,15 +11,31 @@ const app = express();
 app.use(express.json());
 
 // CORS 配置
-app.use(cors({
-  origin: [
+app.use((req, res, next) => {
+  // 允许多个域名
+  const allowedOrigins = [
     'https://my-first-web-app-sigma.vercel.app',
-    'https://my-first-web-j0o91a4by-byw1123s-projects.vercel.app'
-  ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-  credentials: true
-}));
+    'https://my-first-web-j0o91a4by-byw1123s-projects.vercel.app',
+    'https://my-first-web-app-nwlr.vercel.app'
+  ];
+  
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+
+  // 其他 CORS 头
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+  // 处理预检请求
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  next();
+});
 
 // 调试中间件
 app.use((req, res, next) => {
