@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const { MongoClient } = require('mongodb');
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -35,35 +36,50 @@ app.use((err, req, res, next) => {
 });
 
 // 数据库连接
-mongoose.connect(process.env.MONGODB_URI, {
-  dbName: 'myFirstDatabase'  // 指定数据库名称
-})
-.then(async () => {
-  console.log('MongoDB Connected');
-  
-  // 检查并创建集合
-  const db = mongoose.connection.db;
-  const collections = await db.listCollections().toArray();
-  const collectionNames = collections.map(c => c.name);
-  
-  // 如果 users 集合不存在，创建它
-  if (!collectionNames.includes('users')) {
-    await db.createCollection('users');
-    console.log('Users collection created');
+const connectDB = async () => {
+  try {
+    // 获取连接字符串
+    const uri = process.env.MONGODB_URI || process.env.MONGO_URI;
+    if (!uri) {
+      throw new Error('MongoDB connection string is not defined');
+    }
+
+    // 连接 MongoDB
+    const client = new MongoClient(uri);
+    await client.connect();
+    console.log('MongoDB Connected');
+
+    // 创建数据库和集合
+    const db = client.db('myFirstDatabase');
+    
+    // 创建集合
+    const collections = ['users', 'items'];
+    for (const collection of collections) {
+      try {
+        await db.createCollection(collection);
+        console.log(`${collection} collection created`);
+      } catch (err) {
+        if (err.code !== 48) { // 48 是集合已存在的错误码
+          console.warn(`Warning creating ${collection}:`, err.message);
+        }
+      }
+    }
+
+    // 连接 mongoose
+    await mongoose.connect(uri, {
+      dbName: 'myFirstDatabase',
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    });
+
+    console.log('Mongoose connected');
+
+  } catch (err) {
+    console.error('Database connection error:', err);
+    process.exit(1);
   }
-  
-  // 如果 items 集合不存在，创建它
-  if (!collectionNames.includes('items')) {
-    await db.createCollection('items');
-    console.log('Items collection created');
-  }
-})
-.catch(err => {
-  console.error('MongoDB connection error:', err);
-  console.error('Connection string:', process.env.MONGODB_URI.replace(
-    /(mongodb\+srv:\/\/[^:]+:)([^@]+)(@.+)/,
-    '$1****$3'
-  ));
-});
+};
+
+connectDB().catch(console.error);
 
 module.exports = app; 
