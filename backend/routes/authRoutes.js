@@ -70,11 +70,11 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log('Login attempt for:', email);
-    console.log('Password length:', password.length);
+    console.log('🔑 Login attempt for:', email);
 
     // 验证请求数据
     if (!email || !password) {
+      console.log('❌ Missing credentials');
       return res.status(400).json({ 
         error: 'Please provide both email and password' 
       });
@@ -83,25 +83,14 @@ router.post('/login', async (req, res) => {
     // 查找用户
     const user = await User.findOne({ email });
     if (!user) {
-      console.log('User not found:', email);
+      console.log('❌ User not found:', email);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    console.log('Found user:', {
-      email: user.email,
-      passwordLength: user.password.length
-    });
-
     // 验证密码
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log('Password comparison:', {
-      inputPassword: password,
-      hashedPasswordLength: user.password.length,
-      isMatch: isMatch
-    });
-
     if (!isMatch) {
-      console.log('Invalid password for:', email);
+      console.log('❌ Invalid password for:', email);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
@@ -112,7 +101,7 @@ router.post('/login', async (req, res) => {
       { expiresIn: '1d' }
     );
 
-    console.log('Login successful for:', email);
+    console.log('✅ Login successful for:', email);
     res.status(200).json({
       message: 'Login successful',
       token,
@@ -122,7 +111,7 @@ router.post('/login', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('❌ Login error:', error);
     res.status(500).json({ error: 'Login failed' });
   }
 });

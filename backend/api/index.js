@@ -39,9 +39,12 @@ app.get('/', (req, res) => {
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI, {
-      dbName: 'myFirstDatabase',
+      dbName: 'test',
       useNewUrlParser: true,
-      useUnifiedTopology: true
+      useUnifiedTopology: true,
+      retryWrites: true,
+      w: 'majority',
+      authSource: 'admin'
     });
     console.log('✅ MongoDB connected successfully');
   } catch (err) {
@@ -51,7 +54,8 @@ const connectDB = async () => {
       message: err.message,
       code: err.code
     });
-    process.exit(1);
+    // 不要立即退出，让应用继续运行
+    // process.exit(1);
   }
 };
 
