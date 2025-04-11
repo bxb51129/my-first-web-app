@@ -25,7 +25,11 @@ app.use('/api/items', require('../routes/itemRoutes'));
 // 数据库连接
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
+    await mongoose.connect(process.env.MONGODB_URI, {
+      serverSelectionTimeoutMS: 10000, // 超时时间
+      socketTimeoutMS: 45000,          // Socket 超时
+      connectTimeoutMS: 10000,         // 连接超时
+    });
     console.log('MongoDB connected');
   } catch (error) {
     console.error('MongoDB connection error:', error);

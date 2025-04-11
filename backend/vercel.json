@@ -21,13 +21,13 @@
   ],
   "env": {
     "NODE_ENV": "production",
-    "MONGODB_URI": "mongodb+srv://byw1123:byw1123@cluster0.o0hak.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
+    "MONGODB_URI": "mongodb+srv://byw1123:byw1123@cluster0.lywhiuv.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
     "JWT_SECRET": "jwt_secret_631_your_app_2024"
   },
   "functions": {
-    "server.js": {
+    "api/index.js": {
       "memory": 1024,
-      "maxDuration": 10
+      "maxDuration": 60
     }
   },
   "headers": [
