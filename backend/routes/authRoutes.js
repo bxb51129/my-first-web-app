@@ -10,11 +10,13 @@ const router = express.Router();
 // CORS 中间件
 router.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', 'https://my-first-web-app-sigma.vercel.app');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
 
+  // 处理预检请求
   if (req.method === 'OPTIONS') {
-    return res.status(200).end(); // 预检请求响应
+    return res.status(200).end();
   }
   next();
 });
@@ -68,6 +70,12 @@ router.post('/register', async (req, res) => {
 
 // 用户登录
 router.post('/login', async (req, res) => {
+  // 确保每个响应都有 CORS 头
+  res.setHeader('Access-Control-Allow-Origin', 'https://my-first-web-app-sigma.vercel.app');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+
   try {
     const { email, password } = req.body;
     console.log('🔑 Login attempt for:', email);
