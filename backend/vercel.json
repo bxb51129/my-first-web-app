@@ -18,7 +18,7 @@
   ],
   "env": {
     "NODE_ENV": "production",
-    "MONGO_URI": "mongodb+srv://byw1123:byw1123@cluster0.lywhiuv.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+    "MONGO_URI": "mongodb+srv://byw1123:Elva123@cluster0.lywhiuv.mongodb.net/test?retryWrites=true&w=majority&appName=Cluster0&authSource=admin",
     "JWT_SECRET": "jwt_secret_631_your_app_2024"
   }
 } 
