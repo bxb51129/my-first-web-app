@@ -19,15 +19,14 @@ function RegisterPage() {
       const response = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Content-Type': 'application/json'
         },
-        credentials: 'include',
+        credentials: 'omit',
         mode: 'cors',
-        body: JSON.stringify({ 
-          email, 
-          password 
-        })
+        cache: 'no-cache',
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer',
+        body: JSON.stringify({ email, password })
       });
 
       console.log('Response status:', response.status);
