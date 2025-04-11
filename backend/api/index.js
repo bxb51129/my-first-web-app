@@ -39,7 +39,7 @@ app.use((err, req, res, next) => {
 const connectDB = async () => {
   try {
     // 获取连接字符串
-    const uri = process.env.MONGODB_URI || process.env.MONGO_URI;
+    const uri = process.env.MONGO_URI;
     if (!uri) {
       throw new Error('MongoDB connection string is not defined');
     }
