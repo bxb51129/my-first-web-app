@@ -1,22 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './DashboardPage.css';
 
 function DashboardPage() {
   const navigate = useNavigate();
-  const [userData, setUserData] = useState({
-    email: localStorage.getItem('userEmail') || ''
-  });
-
-  const [stats, setStats] = useState({
-    totalItems: 0,
-    completedTasks: 0,
-    pendingTasks: 0
-  });
-
-  useEffect(() => {
-    // 这里可以添加获取用户数据和统计信息的逻辑
-  }, []);
+  const [tasks, setTasks] = useState([]);
+  const [newTask, setNewTask] = useState({ title: '', description: '' });
+  const userEmail = localStorage.getItem('userEmail');
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -24,53 +14,54 @@ function DashboardPage() {
     navigate('/login');
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // 添加任务逻辑
+  };
+
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
-        <div className="welcome-section">
-          <h1>Welcome Back! 👋</h1>
-          <p>{userData.email}</p>
-        </div>
-        <div className="dashboard-actions">
-          <button className="action-button primary-button">Settings</button>
-          <button className="action-button secondary-button" onClick={handleLogout}>
-            Logout
-          </button>
-        </div>
+        <h1>Welcome, {userEmail}</h1>
+        <button className="logout-button" onClick={handleLogout}>Logout</button>
       </div>
 
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-number">{stats.totalItems}</div>
-          <div className="stat-label">Total Items</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-number">{stats.completedTasks}</div>
-          <div className="stat-label">Completed</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-number">{stats.pendingTasks}</div>
-          <div className="stat-label">Pending</div>
-        </div>
+      <div className="task-form-section">
+        <h2>Add New Task</h2>
+        <form className="task-form" onSubmit={handleSubmit}>
+          <input
+            type="text"
+            placeholder="Task Title"
+            value={newTask.title}
+            onChange={(e) => setNewTask({...newTask, title: e.target.value})}
+            required
+          />
+          <textarea
+            placeholder="Task Description"
+            value={newTask.description}
+            onChange={(e) => setNewTask({...newTask, description: e.target.value})}
+            required
+          />
+          <button type="submit">Add Task</button>
+        </form>
       </div>
 
-      <div className="dashboard-content">
-        <div className="dashboard-card">
-          <div className="card-header">
-            <h3 className="card-title">Recent Activity</h3>
-          </div>
-          <div className="card-content">
-            <p>No recent activity</p>
-          </div>
-        </div>
-
-        <div className="dashboard-card">
-          <div className="card-header">
-            <h3 className="card-title">Quick Actions</h3>
-          </div>
-          <div className="card-content">
-            <button className="action-button primary-button">Add New Item</button>
-          </div>
+      <div className="tasks-section">
+        <h2>Your Tasks</h2>
+        <div className="tasks-grid">
+          {tasks.length === 0 ? (
+            <p>No tasks yet. Add your first task above!</p>
+          ) : (
+            tasks.map(task => (
+              <div key={task.id} className="task-card">
+                <h3>{task.title}</h3>
+                <p>{task.description}</p>
+                <div className="task-actions">
+                  <button className="delete-button">Delete</button>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
