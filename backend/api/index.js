@@ -35,11 +35,22 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Something broke!' });
 });
 
+// 在文件顶部添加环境变量日志
+console.log('Environment variables:');
+console.log('MONGO_URI:', process.env.MONGO_URI);
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('JWT_SECRET:', process.env.JWT_SECRET ? '[HIDDEN]' : 'undefined');
+
 // 数据库连接
 const connectDB = async () => {
   try {
     // 获取连接字符串
     const uri = process.env.MONGO_URI;
+    console.log('Attempting to connect with URI:', uri ? uri.replace(
+      /(mongodb\+srv:\/\/[^:]+:)([^@]+)(@.+)/,
+      '$1****$3'
+    ) : 'undefined');
+
     if (!uri) {
       throw new Error('MongoDB connection string is not defined');
     }
@@ -76,6 +87,11 @@ const connectDB = async () => {
 
   } catch (err) {
     console.error('Database connection error:', err);
+    console.error('Error details:', {
+      name: err.name,
+      message: err.message,
+      code: err.code
+    });
     process.exit(1);
   }
 };
