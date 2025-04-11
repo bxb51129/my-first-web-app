@@ -25,14 +25,35 @@ app.use('/api/items', require('../routes/itemRoutes'));
 // 数据库连接
 const connectDB = async () => {
   try {
+    console.log('Attempting to connect to MongoDB...');
+    console.log('Connection string:', process.env.MONGODB_URI.replace(
+      /(mongodb\+srv:\/\/[^:]+:)([^@]+)(@.+)/,
+      '$1****$3'
+    ));
+
     await mongoose.connect(process.env.MONGODB_URI, {
-      serverSelectionTimeoutMS: 10000, // 超时时间
-      socketTimeoutMS: 45000,          // Socket 超时
-      connectTimeoutMS: 10000,         // 连接超时
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 10000,
+      socketTimeoutMS: 45000,
+      connectTimeoutMS: 10000,
+      authSource: 'admin'
     });
-    console.log('MongoDB connected');
+
+    console.log('MongoDB connected successfully');
+    
+    // 测试连接
+    const collections = await mongoose.connection.db.listCollections().toArray();
+    console.log('Available collections:', collections.map(c => c.name));
+    
   } catch (error) {
     console.error('MongoDB connection error:', error);
+    console.error('Error details:', {
+      name: error.name,
+      message: error.message,
+      code: error.code,
+      codeName: error.codeName
+    });
   }
 };
 

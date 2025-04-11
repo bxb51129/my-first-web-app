@@ -5,9 +5,7 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    unique: true,
-    trim: true,
-    lowercase: true
+    unique: true
   },
   password: {
     type: String,
@@ -19,9 +17,11 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
+}, {
+  timestamps: true
 });
 
-// 保存前加密密码
+// 密码加密中间件
 userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
   
