@@ -18,7 +18,8 @@ const userSchema = new mongoose.Schema({
     default: Date.now
   }
 }, {
-  timestamps: true
+  timestamps: true,
+  collection: 'users'  // 明确指定集合名称
 });
 
 // 密码加密中间件

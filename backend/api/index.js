@@ -35,8 +35,35 @@ app.use((err, req, res, next) => {
 });
 
 // 数据库连接
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('MongoDB Connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+mongoose.connect(process.env.MONGODB_URI, {
+  dbName: 'myFirstDatabase'  // 指定数据库名称
+})
+.then(async () => {
+  console.log('MongoDB Connected');
+  
+  // 检查并创建集合
+  const db = mongoose.connection.db;
+  const collections = await db.listCollections().toArray();
+  const collectionNames = collections.map(c => c.name);
+  
+  // 如果 users 集合不存在，创建它
+  if (!collectionNames.includes('users')) {
+    await db.createCollection('users');
+    console.log('Users collection created');
+  }
+  
+  // 如果 items 集合不存在，创建它
+  if (!collectionNames.includes('items')) {
+    await db.createCollection('items');
+    console.log('Items collection created');
+  }
+})
+.catch(err => {
+  console.error('MongoDB connection error:', err);
+  console.error('Connection string:', process.env.MONGODB_URI.replace(
+    /(mongodb\+srv:\/\/[^:]+:)([^@]+)(@.+)/,
+    '$1****$3'
+  ));
+});
 
 module.exports = app; 
