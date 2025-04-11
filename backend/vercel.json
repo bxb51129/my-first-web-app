@@ -9,36 +9,29 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "api/index.js",
-      "headers": {
-        "Access-Control-Allow-Origin": "https://my-first-web-app-sigma.vercel.app",
-        "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,PATCH,OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization, Accept",
-        "Access-Control-Allow-Credentials": "true"
-      }
+      "dest": "api/index.js"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "https://my-first-web-app-sigma.vercel.app" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,POST,PUT,DELETE,PATCH,OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization, Accept" },
+        { "key": "Access-Control-Allow-Credentials", "value": "true" }
+      ]
     }
   ],
   "env": {
     "NODE_ENV": "production",
     "MONGODB_URI": "mongodb+srv://byw1123:byw1123@cluster0.lywhiuv.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
-    "JWT_SECRET": "jwt_secret_631_your_app_2024",
-    "CORS_ORIGIN": "https://my-first-web-app-sigma.vercel.app"
+    "JWT_SECRET": "jwt_secret_631_your_app_2024"
   },
   "functions": {
     "api/index.js": {
       "memory": 1024,
       "maxDuration": 60
     }
-  },
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        { "key": "Access-Control-Allow-Credentials", "value": "true" },
-        { "key": "Access-Control-Allow-Origin", "value": "https://my-first-web-5bqjh0s1a-byw1123s-projects.vercel.app" },
-        { "key": "Access-Control-Allow-Methods", "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT" },
-        { "key": "Access-Control-Allow-Headers", "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version" }
-      ]
-    }
-  ]
+  }
 } 
