@@ -12,26 +12,9 @@
       "dest": "api/index.js"
     }
   ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        { "key": "Access-Control-Allow-Origin", "value": "https://my-first-web-app-sigma.vercel.app" },
-        { "key": "Access-Control-Allow-Methods", "value": "GET,POST,PUT,DELETE,PATCH,OPTIONS" },
-        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization, Accept" },
-        { "key": "Access-Control-Allow-Credentials", "value": "true" }
-      ]
-    }
-  ],
   "env": {
     "NODE_ENV": "production",
     "MONGODB_URI": "mongodb+srv://byw1123:byw1123@cluster0.lywhiuv.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
     "JWT_SECRET": "jwt_secret_631_your_app_2024"
-  },
-  "functions": {
-    "api/index.js": {
-      "memory": 1024,
-      "maxDuration": 60
-    }
   }
 } 
