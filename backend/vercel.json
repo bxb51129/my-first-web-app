@@ -9,7 +9,14 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/api/index.js"
+      "dest": "/api/index.js",
+      "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+      "headers": {
+        "Access-Control-Allow-Origin": "https://my-first-web-app-sigma.vercel.app",
+        "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,PATCH,OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type,Authorization",
+        "Access-Control-Allow-Credentials": "true"
+      }
     },
     {
       "src": "/(.*)",
@@ -20,16 +27,5 @@
     "NODE_ENV": "production",
     "MONGO_URI": "mongodb+srv://byw1123:Elva123@cluster0.lywhiuv.mongodb.net/test?retryWrites=true&w=majority&appName=Cluster0&authSource=admin",
     "JWT_SECRET": "jwt_secret_631_your_app_2024"
-  },
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        { "key": "Access-Control-Allow-Origin", "value": "https://my-first-web-app-sigma.vercel.app" },
-        { "key": "Access-Control-Allow-Methods", "value": "GET,POST,PUT,DELETE,PATCH,OPTIONS" },
-        { "key": "Access-Control-Allow-Headers", "value": "Content-Type,Authorization" },
-        { "key": "Access-Control-Allow-Credentials", "value": "true" }
-      ]
-    }
-  ]
+  }
 } 
