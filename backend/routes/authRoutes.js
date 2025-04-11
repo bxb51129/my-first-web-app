@@ -7,12 +7,16 @@ const crypto = require('crypto'); // 用于生成 Token
 
 const router = express.Router();
 
-// CORS 预检请求处理
-router.options('/register', (req, res) => {
+// CORS 中间件
+router.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', 'https://my-first-web-app-sigma.vercel.app');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.status(200).end();
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end(); // 预检请求响应
+  }
+  next();
 });
 
 // 工具函数：加密密码
@@ -21,51 +25,43 @@ const hashPassword = async (password) => {
     return bcrypt.hash(password, salt);
   };
 // 用户注册
-router.post('/register', (req, res) => {
-  // 设置 CORS 头
-  res.setHeader('Access-Control-Allow-Origin', 'https://my-first-web-app-sigma.vercel.app');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
+router.post('/register', async (req, res) => {
   try {
-    console.log('Registration request received:', req.body);
+    console.log('📝 Registration request received:', req.body);
     
     const { email, password } = req.body;
 
     // 验证输入
     if (!email || !password) {
-      console.log('Missing email or password');
+      console.log('❌ Missing email or password');
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
     // 检查用户是否已存在
-    User.findOne({ email })
-      .then(existingUser => {
-        if (existingUser) {
-          console.log('User already exists:', email);
-          return res.status(400).json({ error: 'User already exists' });
-        }
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      console.log('❌ User already exists:', email);
+      return res.status(400).json({ error: 'User already exists' });
+    }
 
-        // 创建新用户
-        const user = new User({ email, password });
-        return user.save();
-      })
-      .then(user => {
-        console.log('User saved successfully:', user);
-        res.status(201).json({
-          message: 'User registered successfully',
-          user: {
-            id: user._id,
-            email: user.email
-          }
-        });
-      })
-      .catch(error => {
-        console.error('Registration error:', error);
-        res.status(500).json({ error: 'Registration failed' });
-      });
+    // 创建新用户
+    const user = new User({ email, password });
+    await user.save();
+    
+    console.log('✅ User registered successfully:', {
+      id: user._id,
+      email: user.email
+    });
+
+    res.status(201).json({
+      message: 'User registered successfully',
+      user: {
+        id: user._id,
+        email: user.email
+      }
+    });
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error('❌ Registration error:', error);
     res.status(500).json({ error: 'Registration failed' });
   }
 });
