@@ -12,7 +12,7 @@ app.use(express.json());
 
 // CORS 配置
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || true,  // 使用环境变量中的域名，如果没有则自动接受请求的 origin
+  origin: 'https://my-first-web-app-sigma.vercel.app',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
