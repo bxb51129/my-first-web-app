@@ -13,15 +13,26 @@ app.use(express.json());
 // 简单的 CORS 配置
 app.use(cors());
 
+// 路由前缀
+const router = express.Router();
+
+// API 路由
+router.use('/auth', require('../routes/authRoutes'));
+router.use('/items', require('../routes/itemRoutes'));
+
+// 挂载路由到 /api 前缀
+app.use('/api', router);
+
+// 根路由处理
+app.get('/', (req, res) => {
+  res.json({ message: 'API is running' });
+});
+
 // 全局错误处理
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Something broke!' });
 });
-
-// API 路由
-app.use('/api/auth', require('../routes/authRoutes'));
-app.use('/api/items', require('../routes/itemRoutes'));
 
 // 数据库连接
 mongoose.connect(process.env.MONGODB_URI)
