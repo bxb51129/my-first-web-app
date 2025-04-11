@@ -16,7 +16,25 @@ function DashboardPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // 添加任务逻辑
+    // 创建新任务
+    const task = {
+      id: Date.now(), // 临时ID
+      title: newTask.title,
+      description: newTask.description
+    };
+    
+    // 添加到任务列表
+    setTasks([...tasks, task]);
+    
+    // 清空表单
+    setNewTask({ title: '', description: '' });
+    
+    console.log('Task added:', task);
+  };
+
+  const handleDelete = (taskId) => {
+    setTasks(tasks.filter(task => task.id !== taskId));
+    console.log('Task deleted:', taskId);
   };
 
   return (
@@ -57,7 +75,12 @@ function DashboardPage() {
                 <h3>{task.title}</h3>
                 <p>{task.description}</p>
                 <div className="task-actions">
-                  <button className="delete-button">Delete</button>
+                  <button 
+                    className="delete-button"
+                    onClick={() => handleDelete(task.id)}
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
             ))

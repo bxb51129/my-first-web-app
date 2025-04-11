@@ -17,11 +17,15 @@
 
 .logout-button {
   padding: 10px 20px;
-  background: #dc3545;
+  background: #6c757d;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+}
+
+.logout-button:hover {
+  background: #5a6268;
 }
 
 .task-form-section {
