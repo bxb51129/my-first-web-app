@@ -6,13 +6,27 @@ const User = require('../models/User');
 const crypto = require('crypto'); // 用于生成 Token
 
 const router = express.Router();
+
+// CORS 预检请求处理
+router.options('/register', (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', 'https://my-first-web-app-sigma.vercel.app');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.status(200).end();
+});
+
 // 工具函数：加密密码
 const hashPassword = async (password) => {
     const salt = await bcrypt.genSalt(10);
     return bcrypt.hash(password, salt);
   };
 // 用户注册
-router.post('/register', async (req, res) => {
+router.post('/register', (req, res) => {
+  // 设置 CORS 头
+  res.setHeader('Access-Control-Allow-Origin', 'https://my-first-web-app-sigma.vercel.app');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
   try {
     console.log('Registration request received:', req.body);
     
@@ -25,41 +39,34 @@ router.post('/register', async (req, res) => {
     }
 
     // 检查用户是否已存在
-    console.log('Checking if user exists...');
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      console.log('User already exists:', email);
-      return res.status(400).json({ error: 'User already exists' });
-    }
+    User.findOne({ email })
+      .then(existingUser => {
+        if (existingUser) {
+          console.log('User already exists:', email);
+          return res.status(400).json({ error: 'User already exists' });
+        }
 
-    // 创建新用户
-    console.log('Creating new user...');
-    const user = new User({
-      email,
-      password
-    });
-
-    // 保存用户
-    console.log('Saving user...');
-    await user.save();
-    console.log('User saved successfully:', user);
-
-    // 返回成功响应
-    res.status(201).json({
-      message: 'User registered successfully',
-      user: {
-        id: user._id,
-        email: user.email
-      }
-    });
+        // 创建新用户
+        const user = new User({ email, password });
+        return user.save();
+      })
+      .then(user => {
+        console.log('User saved successfully:', user);
+        res.status(201).json({
+          message: 'User registered successfully',
+          user: {
+            id: user._id,
+            email: user.email
+          }
+        });
+      })
+      .catch(error => {
+        console.error('Registration error:', error);
+        res.status(500).json({ error: 'Registration failed' });
+      });
   } catch (error) {
     console.error('Registration error:', error);
-    console.error('Error stack:', error.stack);
-    res.status(500).json({ 
-      error: 'Registration failed', 
-      details: error.message,
-      stack: error.stack
-    });
+    res.status(500).json({ error: 'Registration failed' });
   }
 });
 
