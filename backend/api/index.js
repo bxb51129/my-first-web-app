@@ -6,10 +6,13 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 // 环境变量日志
-console.log('Environment variables:');
-console.log('MONGO_URI:', process.env.MONGO_URI ? '[HIDDEN]' : 'undefined');
-console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('JWT_SECRET:', process.env.JWT_SECRET ? '[HIDDEN]' : 'undefined');
+console.log('\n🔧 Environment variables:');
+console.log('🧪 MONGO_URI:', process.env.MONGO_URI ? process.env.MONGO_URI.replace(
+  /(mongodb\+srv:\/\/[^:]+:)([^@]+)(@.+)/,
+  '$1****$3'
+) : '❌ undefined');
+console.log('🌍 NODE_ENV:', process.env.NODE_ENV || '❌ undefined');
+console.log('🔑 JWT_SECRET:', process.env.JWT_SECRET ? '✅ [HIDDEN]' : '❌ undefined');
 
 const app = express();
 
@@ -40,10 +43,10 @@ const connectDB = async () => {
       useNewUrlParser: true,
       useUnifiedTopology: true
     });
-    console.log('✅ MongoDB connected');
+    console.log('✅ MongoDB connected successfully');
   } catch (err) {
-    console.error('❌ Connection failed:', err.message);
-    console.error('Error details:', {
+    console.error('❌ MongoDB connection failed');
+    console.error('🔍 Error details:', {
       name: err.name,
       message: err.message,
       code: err.code
