@@ -123,17 +123,18 @@ router.post('/check-email', async (req, res) => {
 router.post('/reset-password', async (req, res) => {
   try {
     const { email, newPassword } = req.body;
-    console.log('Reset password attempt for:', email);
-    console.log('New password length:', newPassword.length);
+    console.log('🔄 Reset password attempt for:', email);
 
     // 验证请求数据
     if (!email || !newPassword) {
+      console.log('❌ Missing email or new password');
       return res.status(400).json({ 
         error: 'Please provide both email and new password' 
       });
     }
 
     if (newPassword.length < 6) {
+      console.log('❌ Password too short');
       return res.status(400).json({
         error: 'Password must be at least 6 characters long'
       });
@@ -142,31 +143,22 @@ router.post('/reset-password', async (req, res) => {
     // 查找用户
     const user = await User.findOne({ email });
     if (!user) {
-      console.log('User not found for reset password:', email);
+      console.log('❌ User not found for reset password:', email);
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // 加密新密码
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(newPassword, salt);
-    console.log('Password hashed successfully');
-
     // 更新用户密码
-    user.password = hashedPassword;
+    user.password = newPassword; // 模型中的 pre save 中间件会自动加密密码
     await user.save();
-    console.log('User password updated in database');
-
-    // 尝试验证新密码
-    const verifyPassword = await bcrypt.compare(newPassword, user.password);
-    console.log('New password verification:', verifyPassword);
-
-    console.log('Password reset successful for:', email);
+    
+    console.log('✅ Password reset successful for:', email);
     res.status(200).json({ 
       message: 'Password reset successful',
       success: true 
     });
+
   } catch (error) {
-    console.error('Reset password error:', error);
+    console.error('❌ Reset password error:', error);
     res.status(500).json({ 
       error: 'Failed to reset password',
       message: error.message 
