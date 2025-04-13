@@ -89,6 +89,7 @@
 .task-actions {
   display: flex;
   justify-content: flex-end;
+  gap: 8px;
   margin-top: 15px;
 }
 
@@ -114,6 +115,45 @@
   margin: 10px 0;
 }
 
+.edit-button {
+  padding: 5px 10px;
+  background: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.edit-button:hover {
+  background: #357abd;
+}
+
+.save-button {
+  padding: 5px 10px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.save-button:hover {
+  background: #218838;
+}
+
+.cancel-button {
+  padding: 5px 10px;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cancel-button:hover {
+  background: #5a6268;
+}
+
 .edit-form {
   display: grid;
   gap: 10px;
@@ -133,50 +173,6 @@
 
 .edit-actions {
   display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-}
-
-.button-group {
-  display: flex;
   gap: 8px;
-}
-
-.edit-button {
-  background: #4a90e2;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.edit-button:hover {
-  background: #357abd;
-}
-
-.save-button {
-  background: #28a745;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.save-button:hover {
-  background: #218838;
-}
-
-.cancel-button {
-  background: #6c757d;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.cancel-button:hover {
-  background: #5a6268;
+  justify-content: flex-end;
 } 
